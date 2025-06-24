@@ -157,8 +157,8 @@ export const brandOptionsMap = {
   adidas: "Adidas",
   puma: "Puma",
   levi: "Levi",
-  zara: "Zara",
-  "h&m": "H&M",
+  
+
 };
 
 export const filterOptions = {
@@ -174,8 +174,8 @@ export const filterOptions = {
     { id: "adidas", label: "Adidas" },
     { id: "puma", label: "Puma" },
     { id: "levi", label: "Levi's" },
-    { id: "zara", label: "Zara" },
-    { id: "h&m", label: "H&M" },
+    
+    
   ],
 };
 
