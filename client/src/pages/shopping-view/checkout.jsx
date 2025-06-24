@@ -17,8 +17,6 @@ function ShoppingCheckout() {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
-  console.log(currentSelectedAddress, "cartItems");
-
   const totalCartAmount =
     cartItems && cartItems.items && cartItems.items.length > 0
       ? cartItems.items.reduce(
@@ -38,7 +36,6 @@ function ShoppingCheckout() {
         title: "Your cart is empty. Please add items to proceed",
         variant: "destructive",
       });
-
       return;
     }
     if (currentSelectedAddress === null) {
@@ -46,7 +43,6 @@ function ShoppingCheckout() {
         title: "Please select one address to proceed.",
         variant: "destructive",
       });
-
       return;
     }
 
@@ -82,11 +78,79 @@ function ShoppingCheckout() {
     };
 
     dispatch(createNewOrder(orderData)).then((data) => {
-      console.log(data, "sangam");
       if (data?.payload?.success) {
         setIsPaymemntStart(true);
       } else {
         setIsPaymemntStart(false);
+      }
+    });
+  }
+
+  function handleUPIPayment() {
+    if (cartItems.length === 0) {
+      toast({
+        title: "Your cart is empty. Please add items to proceed",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (currentSelectedAddress === null) {
+      toast({
+        title: "Please select one address to proceed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const confirm = window.confirm(
+      "Please pay ₹" +
+        totalCartAmount +
+        " to UPI ID: 9733996528-7@ybl\n\nAfter payment, click OK to place your order."
+    );
+
+    if (!confirm) return;
+
+    const orderData = {
+      userId: user?.id,
+      cartId: cartItems?._id,
+      cartItems: cartItems.items.map((singleCartItem) => ({
+        productId: singleCartItem?.productId,
+        title: singleCartItem?.title,
+        image: singleCartItem?.image,
+        price:
+          singleCartItem?.salePrice > 0
+            ? singleCartItem?.salePrice
+            : singleCartItem?.price,
+        quantity: singleCartItem?.quantity,
+      })),
+      addressInfo: {
+        addressId: currentSelectedAddress?._id,
+        address: currentSelectedAddress?.address,
+        city: currentSelectedAddress?.city,
+        pincode: currentSelectedAddress?.pincode,
+        phone: currentSelectedAddress?.phone,
+        notes: currentSelectedAddress?.notes,
+      },
+      orderStatus: "pending",
+      paymentMethod: "UPI",
+      paymentStatus: "pending",
+      totalAmount: totalCartAmount,
+      orderDate: new Date(),
+      orderUpdateDate: new Date(),
+      paymentId: "",
+      payerId: "",
+    };
+
+    dispatch(createNewOrder(orderData)).then((data) => {
+      if (data?.payload?.success) {
+        toast({
+          title: "Order placed with UPI! We’ll verify your payment shortly.",
+        });
+      } else {
+        toast({
+          title: "Failed to place UPI order.",
+          variant: "destructive",
+        });
       }
     });
   }
@@ -108,13 +172,13 @@ function ShoppingCheckout() {
         <div className="flex flex-col gap-4">
           {cartItems && cartItems.items && cartItems.items.length > 0
             ? cartItems.items.map((item) => (
-                <UserCartItemsContent cartItem={item} />
+                <UserCartItemsContent key={item.productId} cartItem={item} />
               ))
             : null}
           <div className="mt-8 space-y-4">
             <div className="flex justify-between">
               <span className="font-bold">Total</span>
-              <span className="font-bold">${totalCartAmount}</span>
+              <span className="font-bold">₹{totalCartAmount}</span>
             </div>
           </div>
           <div className="mt-4 w-full">
@@ -122,6 +186,14 @@ function ShoppingCheckout() {
               {isPaymentStart
                 ? "Processing Paypal Payment..."
                 : "Checkout with Paypal"}
+            </Button>
+          </div>
+          <div className="mt-2 w-full">
+            <Button
+              onClick={handleUPIPayment}
+              className="w-full bg-green-600 text-white hover:bg-green-700"
+            >
+              Pay with UPI (9733996528-7@ybl)
             </Button>
           </div>
         </div>
