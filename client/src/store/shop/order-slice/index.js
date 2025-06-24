@@ -72,15 +72,21 @@ const shoppingOrderSlice = createSlice({
       .addCase(createNewOrder.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(createNewOrder.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.approvalURL = action.payload.approvalURL;
-        state.orderId = action.payload.orderId;
-        sessionStorage.setItem(
-          "currentOrderId",
-          JSON.stringify(action.payload.orderId)
-        );
-      })
+  .addCase(createNewOrder.fulfilled, (state, action) => {
+  state.isLoading = false;
+  state.orderId = action.payload.orderId;
+
+  // Only set approvalURL if present (i.e., PayPal orders)
+  if (action.payload.approvalURL) {
+    state.approvalURL = action.payload.approvalURL;
+    sessionStorage.setItem(
+      "currentOrderId",
+      JSON.stringify(action.payload.orderId)
+    );
+  } else {
+    state.approvalURL = null;
+  }
+})
       .addCase(createNewOrder.rejected, (state) => {
         state.isLoading = false;
         state.approvalURL = null;
