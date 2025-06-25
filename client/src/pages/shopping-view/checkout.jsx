@@ -185,7 +185,7 @@ function ShoppingCheckout() {
             <Button onClick={handleInitiatePaypalPayment} className="w-full">
               {isPaymentStart
                 ? "Processing Paypal Payment..."
-                : "Checkout with Paypal"}
+                : "Pay with Paypal"}
             </Button>
           </div>
           <div className="mt-2 w-full">
@@ -193,7 +193,7 @@ function ShoppingCheckout() {
               onClick={handleUPIPayment}
               className="w-full bg-green-600 text-white hover:bg-green-700"
             >
-              Pay with UPI (9733996528-7@ybl)
+              Pay with UPI
             </Button>
           </div>
         </div>
